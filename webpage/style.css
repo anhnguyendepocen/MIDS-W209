@@ -1,0 +1,16 @@
+p {
+    color: red;
+}
+
+a {
+    color: blue;
+}
+body {
+    font-family: arial, helvetica, sans-serif;
+    font-size: 14px;
+}
+
+h1 {
+    color: #ffc;
+    background-color: #009;
+}
