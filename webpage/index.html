@@ -5,9 +5,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <script>
+        var convertTemp = function () {
+            tempField = document.getElementById('temperature');
+            t = tempField.value;
+            if (t == null || t == "") {
+                alert("You didn't enter a temperature!");
+                return false;
+            } else {
+                var tempElements = t.trim().split(/^([0-9-.]+)([CF])/);
+                if (tempElements[2] == null || tempElements[2] == "") {
+                    alert("Please specify C or F - like 100F or -30C");
+                    return false;
+                }
+                if (tempElements[2] == "C") {
+                    tempField.value = ctof(tempElements[1]) + "F";
+                } else {
+                    tempField.value = ftoc(tempElements[1]) + "C";
+                }
+            }
+            return true;
+        }
+        var ftoc = function (f) {
+            return (f - 32) * 5/9;
+        };
+        var ctof = function (c) {
+            return c * 9/5 + 32;
+        };
+
+    </script>
     <h1>Simple Web Page</h1>
-    This is a simple web page to illustrate simple forms and
-    even some CSS
+    This is a simple web page to illustrate simple forms and even some CSS
     <p>
     <h3>Volkswagen Westfalia</h3>
     If you're interested in <a href="https://en.wikipedia.org/wiki/Westfalia">VW camper vans</a> then check out the Wikipedia article!
@@ -60,14 +88,10 @@
     </table>
     </p>
     <p>
-	<form action="" method="post">
 
-	    <p>Type something here: <input type="text" name="textarea" value=""></p>
+	    <p>Enter temperature: <input type="text" id='temperature' name="temperature" value=""></p>
+		<input type="button" id="ctof" name="Convert To Fahrenheit" value="Convert To Fahrenheit" onclick="return convertTemp()">
 
-		<p><input type="submit" value="Don't Press Me"></p>
-
-	    <p><input type="submit" value="Don't Press Me Either"></p>
-	</form>
 	</p>
 </body>
 </html>
