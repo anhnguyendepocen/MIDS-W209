@@ -22,13 +22,13 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 
 ### Hypothesis 1: Votomatic voting machines have a higher overvote as a fraction of the total vote than other technologies.
 
-![Overvotes By Technology and Columns](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/Overvotes.png "Overvotes By Technology and Columns")
+![Overvotes By Technology](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteByTechByColumn.png "Overvotes By Technology and Columns")
 
-**What's informative about this view:** This view shows the number of overvotes by columns and by technology type for the Florida 2000 Presidential election. This view shows that the most overvotes occur with the Votomatic voting machines.
+**What's informative about this view:** This view shows the number of overvotes by columns and by technology type for the Florida 2000 Presidential election. This view shows that the highest counts of overvotes occur with the Votomatic voting machines.
 
 **What could be improved about this view:** This view uses only the raw counts of overvotes instead of the proportion of overvotes of the total vote count. Doing so would account for populations of counties and provide a better sense for *error rate* as opposed to *error count*.
 
-Second View - Image Here
+![Overvote Rate By Technology and Column](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteRate.png)
 
 **What's informative about this view:** This view shows the overvotes as a percentage of the total votes. Clearly the highest error rates are the optical and Datavote technologies. In fact, the DataVote has the highest error rate across both 1 and 2 column formats.
 
