@@ -22,7 +22,7 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 
 ### Hypothesis 1: Votomatic voting machines have a higher overvote as a fraction of the total vote than other technologies.
 
-First View - Image Here
+![Overvotes By Technology and Columns](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/Overvotes.png "Overvotes By Technology and Columns")
 
 **What's informative about this view:** This view shows the number of overvotes by columns and by technology type for the Florida 2000 Presidential election. This view shows that the most overvotes occur with the Votomatic voting machines.
 
