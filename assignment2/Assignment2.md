@@ -42,10 +42,8 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 ![County Overvote Rates](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/CountyOvervoteRateByTechCol.png){ width=100% }
 
 \newpage
-
 ### Hypothesis 3: The Buchanan vote count in Palm Beach county is larger than it should be.
-
-![Buchanan Votes By County](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/BuchananCounts.png){ width=100% }
+![Buchanan Votes By County](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/BuchananCounts.png){ height=100% }
 
 \newpage
 
