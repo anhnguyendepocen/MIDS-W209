@@ -22,22 +22,35 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 
 ### Hypothesis 1: Votomatic voting machines have a higher overvote as a fraction of the total vote than other technologies.
 
-![Overvotes By Technology](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteByTechByColumn.png "Overvotes By Technology and Columns")
+![Overvotes By Technology](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervotesByTechnology.png "Overvotes By Technology and Columns")
 
-**What's informative about this view:** This view shows the number of overvotes by columns and by technology type for the Florida 2000 Presidential election. This view shows that the highest counts of overvotes occur with the [Votomatic](http://americanhistory.si.edu/vote/resources_votomatic.html) voting machines.
+**What's informative about this view:** This view shows the number of overvotes by technology type for the Florida 2000 Presidential election. This view shows that the highest counts of overvotes occur with the [Votomatic](http://americanhistory.si.edu/vote/resources_votomatic.html) voting machines.
 
-**What could be improved about this view:** This view uses only the raw counts of overvotes instead of the proportion of overvotes of the total vote count. Doing so would account for populations of counties and provide a better sense for *error rate* as opposed to *error count*. The sizes of the fonts are difficult to control for the image to get a good looking image.
+**What could be improved about this view:** This view uses only the raw counts of overvotes instead of the proportion of overvotes of the total vote count. Doing so would account for populations of counties and provide a better sense for *error rate* as opposed to *error count*.
 
-![Overvote Rate By Technology and Column](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteRate.png)
+![Overvote Rate By Technology and Column](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteRateByTechnology.png)
+
+**What's informative about this view:** This view shows the overvote rate by technology type for the Florida 2000 Presidential election. This view shows that the highest counts of overvotes occur with the [Datavote](http://americanhistory.si.edu/vote/resources_datavote.html) voting machines and hand voting.
+
+**What could be improved about this view:** We can get a better overall view of the column format with respect to overvote rate by combining this view with the format.
+
+![Overvote Rate By Technology and Column](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervoteRateByColTech.png)
 
 **What's informative about this view:** This view shows the overvotes as a percentage of the total votes. Clearly the technology with the highest error rate regardless of number of columns is the [Datavote](http://americanhistory.si.edu/vote/resources_datavote.html). While all technologies show an increase in overvote rates from 1 column format to 2 column format, only the Datavote is high in both categories.
 
-**What could be improved about this view:** There is more going on here than just voting technology. The 2 column format is more prone to overvotes than the single column format for most technology types except the Datavote. We can bring more into the picture here on what counties and what candidates were involved in where the Datavote technology was used.
+**What could be improved about this view:** There is more going on here than just voting technology. The 2 column format is more prone to overvotes than the single column format for most technology types except the Datavote. We can bring more into the picture here on what counties and what candidates were involved in where the Datavote technology was used. 
 
+Clearly the hypothesis that the Votomatic has a higher overvote is incorrect when comparing the overvotes as a function of the total vote but there is a likely correlation between the overvote and the technology as well.
+
+\newpage
 
 ### Hypothesis 2: Two column format has a higher overvote rate than single column format
 
 ![Overvote Rate for 1 and 2 Column Formats](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervotesByCol.png){ width=100% }
+
+This investigation follows from the findings that not only does the technology have a role to play in the overvotes but so does the format of the ballot. Cleary the overvote rate for a 2 column format is significantly higher than for 1 column format ballots.
+
+We can get a little deeper to see how the overvote rate varies as a function of ballot columns, technology, and county.
 
 ![County Overvote Rates](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/CountyOvervoteRateByTechCol.png){ width=100% }
 
@@ -49,6 +62,4 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 
 ![Buchanan Relative Votes](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/BuchananDemRepub.png){ width=100% }
 
-This graphic shows the relationships between the Republican, Democrat, and Buchanan votes by county. In this view the traditional red/blue colors indicated which party carried the county and the size of the circle is the proportion of Buchanan votes to total votes. Pat Buchanan was an [extremely conservative candidate](https://en.wikipedia.org/wiki/Pat_Buchanan_presidential_campaign,_2000) so if we also equate the Republican party with conservatism we would expect to see a corresponding increase in the Buchanan vote for those counties that voted Republican. We do see this trend in general in the graphic - the red circles tend to be larger than the blue ones - but this is not always the case. Palm Beach county is the highest Buchanan vote proportion and stands out from the other blue circles with the highest proportion of Buchanan votes.
-
-Palm Beach County is also the county at the center of the controversy of the "hanging chad" of the 2000 election. Palm Beach county used a 2 column format and Votomatic card punch machine. In the 2 column format Bush's name would be opposite Buchanan's name and have adjacent chads. One possible explanation is that the Buchanan votes were actually meant to be Bush votes.
+This graphic shows the relationships between the Republican, Democrat, and Buchanan votes by county. In this view the traditional red/blue colors indicated which party carried the county and the size of the circle is the proportion of Buchanan votes to total votes. Pat Buchanan was an [extremely conservative candidate](https://en.wikipedia.org/wiki/Pat_Buchanan_presidential_campaign,_2000) so if we also equate the Republican party with conservatism we would expect to see a corresponding increase in the Buchanan vote for those counties that voted Republican. We do see this trend in general in the graphic - the red circles tend to be larger than the blue ones - but this is not always the case. Palm Beach county is the highest Buchanan vote proportion and stands out from the other blue circles with the highest proportion of Buchanan votes. Palm Beach County is also the county at the center of the controversy of the "hanging chad" of the 2000 election. Palm Beach county used a 2 column format and Votomatic card punch machine. In the 2 column format Bush's name would be opposite Buchanan's name and have adjacent chads. One possible explanation is that the Buchanan votes were actually meant to be Bush votes.
