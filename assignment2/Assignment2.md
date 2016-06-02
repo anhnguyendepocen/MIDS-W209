@@ -34,27 +34,18 @@ Using [county data from the 2000 Presidential elections in Florida](https://www.
 
 **What could be improved about this view:** There is more going on here than just voting technology. The 2 column format is more prone to overvotes than the single column format for most technology types except the Datavote. We can bring more into the picture here on what counties and what candidates were involved in where the Datavote technology was used.
 
-Third View - Image Here
-
-\newpage
 
 ### Hypothesis 2: Two column format has a higher overvote rate than single column format
 
-![Overvote Rate for 1 and 2 Column Formats](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervotesByCol.png) { width=100% }
+![Overvote Rate for 1 and 2 Column Formats](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/OvervotesByCol.png){ width=100% }
 
-\newpage
-
-![County Overvote Rates](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/CountyOvervoteRateByTechCol.png) { height=100% }
+![County Overvote Rates](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/CountyOvervoteRateByTechCol.png){ width=100% }
 
 \newpage
 
 ### Hypothesis 3: The Buchanan vote count in Palm Beach county is larger than it should be.
 
-![Buchanan Votes By County](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/BuchananCounts.png){ height=100% }
-
-**What's informative about this view:** This view shows that Buchanan vote by county. It's obvious that the Palm Beach Buchanan vote count stands out.
-
-**What could be improved about this view:** The text is difficult to see on the graph.
+![Buchanan Votes By County](https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment2/BuchananCounts.png){ width=100% }
 
 \newpage
 
