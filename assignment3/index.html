@@ -1,0 +1,44 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3 Page Template</title>
+		<script type="text/javascript" src="../d3/d3.min.js"></script>
+		<style type="text/css">
+			div.bar {
+				display: inline-block;
+				width: 10px;
+				height: 75px;
+				background-color: teal;
+				margin-right: 2px;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			d3.csv("cycling_2.csv", function(d) {
+				return {
+					date: new Date(d.date),
+					distance: +d.distance,
+					elevationGain: parseInt(d.elevationGain.replace(',',''),10),
+					calories: parseInt(d.calories.replace(',',''),10)
+				};
+			}, function(data) {
+				d3.select("body").selectAll("div")
+				.data(data)
+				.enter()
+				.append("div")
+				.attr("class", "bar")
+				.style("height", function(f) {
+					var barHeight = f.distance * 5;
+					return barHeight + "px";
+				});
+
+			});
+
+
+
+		</script>
+		<div></div>
+	</body>
+</html>
