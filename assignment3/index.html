@@ -16,7 +16,7 @@
 	<body>
 		<script type="text/javascript">
 
-			d3.csv("cycling_2.csv", function(d) {
+			d3.csv("https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment3/cycling_2.csv", function(d) {
 				return {
 					date: new Date(d.date),
 					distance: +d.distance,
