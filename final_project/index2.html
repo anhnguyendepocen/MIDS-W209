@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        .axis-label {
+            font-family: sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        #label {
+            position: relative;
+            width: auto;
+            height: auto;
+        }
+        #label p {
+            font-family: sans-serif;
+            font-size: 11px;
+            font-weight:bold;
+        }
+
+        #tooltip {
+            position: absolute;
+            width: 150px;
+            height: auto;
+            padding: 10px;
+            background-color: white;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            -webkit-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+            -moz-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+
+        #tooltip.hidden {
+            display: none;
+        }
+
+        #tooltip p {
+            margin: 0;
+            font-family: sans-serif;
+            font-size: 11px;
+            line-height: 14px;
+        }
+
+        .heading1 {
+            position: relative;
+            left: 325px;
+            width: 200px;
+            font-family: sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .heading3 {
+            position: relative;
+            left: 300px;
+            width: 230px;
+            font-family: sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+        }
+    </style>
+    <title>D3 Page Template</title>
+</head>
+<body>
+<h1 class="heading1" align="left;40px" >Bicycling Stats</h1>
+<h3 class="heading3" align="left">Click on any bar chart to sort</h3>
+
+<div id="bar1"></div>
+<div id="bar2"></div>
+
+<div id="reset">
+    <input name="resetButton"
+           type="button"
+           value="Reset Barchart Sort" />
+</div>
+
+<div id="scatterplot"></div>
+
+<div id="tooltip" class="hidden">
+    <p><span id="date" style="font-weight: bold"></span></p>
+    <p>Distance <span id="distance">10</span> miles</p>
+    <p>Elevation Gain <span id="elevation">20</span> feet</p>
+    <p>Average Heart Rate <span id="hr">120</span> bpm</p>
+    <p>Calories <span id="calories">1000</span> Calories</p>
+</div>
+
+<div id="label">
+    <p><span id="labeltext">label</span></p>
+</div>
+
+
+    <script type="text/javascript" src="/assignment3/d3.js"></script>
+    <script type="text/javascript">
+
+        var w = 800;
+        var h = 200;
+        var scatterplot_h = 400;
+
+        var barPadding = 1;
+        var barMargin = 5;
+        var yAxisPadding = 60;
+        var xAxisPadding = 20;
+        var scatterplotMargin = 22;
+
+        var dataset;
+
+        var svg1Fill = "teal";
+        var svg2Fill = "olive";
+        var barSelect = "orange";
+        var svg3Fill = "violet";
+        var svg3Select = "navy";
+
+        // sort order state tracking
+        var bar1SortOrder = false;
+        var bar2SortOrder = false;
+
+        var svg1 = d3.select("#bar1")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h)
+                .attr("id", "svg1");
+
+        var svg2 = d3.select("#bar2")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h)
+                .attr("id", "svg2");
+
+        var svg3 = d3.select("#scatterplot")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", scatterplot_h - scatterplotMargin)
+                .attr("id", "svg3");
+
+        d3.csv("https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/assignment3/cycling_2.csv", function(f) {
+
+            dataset = f;
+            var maxDistance = d3.max(dataset, function(d) {
+                return parseFloat(d.distance);
+            });
+            var maxElevationGain = d3.max(dataset, function(d) {
+                return parseFloat(d.elevationGain);
+            });
+
+            var maxCalories = d3.max(dataset, function(d) {
+                return parseFloat(d.calories);
+            });
+
+            var minAvgHR = d3.min(dataset, function(d) {
+                return parseFloat(d.avgHR);
+            });
+
+            var maxAvgHR = d3.max(dataset, function(d) {
+                return parseFloat(d.avgHR);
+            });
+
+            var xScale = d3.scale.ordinal()
+                    .domain(d3.range(dataset.length))
+                    .rangeRoundBands([yAxisPadding, w], 0.2);
+
+            var distanceScale = d3.scale.linear()
+                    .domain([0, maxDistance])
+                    .range([0, h - barMargin]);
+
+            var elevationGainScale = d3.scale.linear()
+                    .domain([0, maxElevationGain])
+                    .range([0, h - barMargin]);
+
+            var distanceAxis = d3.svg.axis()
+                    .scale(d3.scale.linear().domain([0, maxDistance]).range([h - barMargin, 0]))
+                    .orient("left")
+                    .ticks(5);
+
+            var elevationGainAxis = d3.svg.axis()
+                    .scale(elevationGainScale)
+                    .orient("left")
+                    .ticks(5);
+
+
+            // distance bar chart
+            svg1.selectAll("rect")
+                    .data(dataset)
+                    .enter()
+                    .append("rect")
+                    .sort(function(a,b) {
+                        return d3.ascending(Date.parse(a.date), Date.parse(b.date))
+                    })
+                    .attr({
+                        x: function (d, i) {
+                            return xScale(i);
+                        },
+                        y: function (d) {
+                            return h - distanceScale(d.distance);
+                        },
+                        width: w / dataset.length - barPadding,
+                        height: function (d) {
+                            return distanceScale(d.distance)
+                        },
+                        fill: svg1Fill,
+                        id: function (d, i) {
+                            return i + "svg1";
+                        }
+                    })
+                    .on("mouseover", function(d, i) {
+
+                        var selectId = this.id.substring(0, this.id.indexOf("svg1"))
+                        var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand()/2;
+                        var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+                        d3.select("#tooltip")
+                                .style("left", xPosition + "px")
+                                .style("top", yPosition + "px")
+                                .select("#distance")
+                                .text(d.distance);
+                        d3.select("#tooltip")
+                                .select("#date")
+                                .text((new Date(d.date)).toLocaleDateString());
+                        d3.select("#tooltip")
+                                .select("#elevation")
+                                .text(d.elevationGain);
+                        d3.select("#tooltip")
+                                .select("#hr")
+                                .text(d.avgHR);
+                        d3.select("#tooltip")
+                                .select("#calories")
+                                .text(d.calories);
+                        d3.select("#tooltip").classed("hidden", false);
+                        d3.select(this)
+                                .attr("fill", barSelect);
+                        svg2.select("rect[id='" + selectId + "svg2']")
+                            .attr("fill", barSelect);
+                        svg3.select("circle[id='" + selectId + "svg3']")
+                                .attr("fill", svg3Select);
+                    })
+                    .on("mouseout", function(d, i) {
+                        var selectId = this.id.substring(0, this.id.indexOf("svg1"))
+                        d3.select("#tooltip").classed("hidden", true);
+                        d3.select(this)
+                                .attr("fill", svg1Fill);
+                        svg2.select("rect[id='" + selectId + "svg2']")
+                                .attr("fill", svg2Fill);
+                        svg3.select("circle[id='"+ selectId + "svg3']")
+                                .attr("fill", svg3Fill);
+
+                    })
+                    .on("click", function() {
+                        sortBar1Plot();
+                    });
+
+            // tack on the axis
+            svg1.append("g").attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisPadding + ",0)")
+                    .call(distanceAxis);
+
+            svg1.append("text")
+                    .attr("class", "axis-label")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (yAxisPadding/2 - 16) +","+(h/2)+")rotate(-90)")
+                    .text("Miles");
+
+            // elevation gain bar chart
+            svg2.selectAll("rect")
+                    .data(dataset)
+                    .enter()
+                    .append("rect")
+                    .sort(function(a,b) {
+                        return d3.ascending(Date.parse(a.date), Date.parse(b.date))
+                    })
+                    .attr({
+                        x: function (d, i) {
+                            return xScale(i);
+                        },
+                        y: 0,
+                        width: w / dataset.length - barPadding,
+                        height: function (d) {
+                            return elevationGainScale(d.elevationGain)
+                        },
+                        fill: svg2Fill,
+                        id: function (d, i) {
+                            return i + "svg2";
+                        }
+                    })
+                    .on("mouseover", function(d, i) {
+                        var selectId = this.id.substring(0, this.id.indexOf("svg2"))
+                        var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand()/2;
+                        var yPosition = parseFloat(d3.select(this).attr("height")) / 2 + h / 2;
+                        d3.select("#tooltip")
+                                .style("left", xPosition + "px")
+                                .style("top", yPosition + "px")
+                                .select("#distance")
+                                .text(d.distance);
+                        d3.select("#tooltip")
+                                .select("#date")
+                                .text((new Date(d.date)).toLocaleDateString());
+                        d3.select("#tooltip")
+                                .select("#elevation")
+                                .text(d.elevationGain);
+                        d3.select("#tooltip")
+                                .select("#hr")
+                                .text(d.avgHR);
+                        d3.select("#tooltip")
+                                .select("#calories")
+                                .text(d.calories);
+                        d3.select("#tooltip").classed("hidden", false);
+
+                        d3.select(this)
+                                .attr("fill", barSelect);
+                        svg1.select("rect[id='" + selectId + "svg1']")
+                                .attr("fill", barSelect);
+                        svg3.select("circle[id='" + selectId + "svg3']")
+                                .attr("fill", svg3Select);
+                    })
+                    .on("mouseout", function(d, i) {
+                        var selectId = this.id.substring(0, this.id.indexOf("svg2"))
+                        d3.select("#tooltip").classed("hidden", true);
+                        d3.select(this)
+                                .attr("fill", svg2Fill);
+                        svg1.select("rect[id='" + selectId + "svg1']")
+                                .attr("fill", svg1Fill);
+                        svg3.select("circle[id='" + selectId + "svg3']")
+                                .attr("fill", svg3Fill);
+                    })
+                    .on("click", function() {
+                        sortBar2Plot();
+                    });
+
+
+            // tack on the axis
+            svg2.append("g").attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisPadding + ",4)")
+                    .call(elevationGainAxis);
+
+            svg2.append("text")
+                    .attr("class", "axis-label")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (yAxisPadding/2 - 16) +","+(h/2)+")rotate(-90)")
+                    .text("Elevation Gain")
+                    .on("click", function() {
+                        sortByDates();
+                    });
+
+            /* Scatterplot drawing area */
+
+            var elevationGainScale2 = d3.scale.linear()
+                    .domain([0, maxElevationGain])
+                    .range([yAxisPadding, w - yAxisPadding]);
+
+            var caloriesScale = d3.scale.linear()
+                    .domain([0, maxCalories])
+                    .range([scatterplotMargin + xAxisPadding, scatterplot_h - scatterplotMargin]);
+
+            var avgHRScale = d3.scale.linear()
+                    .domain([minAvgHR, maxAvgHR])
+                    .range([1, scatterplotMargin * scatterplotMargin]);
+
+            var elevationGainAxis2 = d3.svg.axis()
+                    .scale(elevationGainScale2)
+                    .orient("bottom");
+
+            var caloriesAxis = d3.svg.axis()
+                    .scale(d3.scale.linear()
+                            .domain([0, maxCalories])
+                            .range([scatterplot_h - scatterplotMargin, scatterplotMargin + xAxisPadding]))
+                    .orient("left");
+
+            svg3.selectAll("circle")
+                    .data(dataset)
+                    .enter()
+                    .append("circle")
+                    .attr("fill", svg3Fill)
+                    .sort(function(a,b) {
+                        return d3.ascending(Date.parse(a.date), Date.parse(b.date))
+                    })
+                    .attr({
+                        cx: function (d) {
+                            return elevationGainScale2(d.elevationGain);
+                        },
+                        cy: function (d) {
+                            return scatterplot_h - caloriesScale(d.calories);
+                        },
+                        id: function (d, i) {
+                            return i + "svg3";
+                        },
+                        r: function(d) {
+                            return Math.sqrt(avgHRScale(d.avgHR));
+                        },
+                        stroke: "black",
+                        opacity: "0.5"
+                    })
+                    .on("mouseover", function(d, i) {
+                        var xPosition = parseFloat(d3.select(this).attr("cx"));
+                        var yPosition = parseFloat(d3.select(this).attr("cy")) / 2 + scatterplot_h;
+                        if (xPosition > w-200) {
+                            xPosition = xPosition - 100;
+                        }
+                        d3.select("#tooltip")
+                                .style("left", xPosition + "px")
+                                .style("top", yPosition + "px")
+                                .select("#distance")
+                                .text(d.distance);
+                        d3.select("#tooltip")
+                                .select("#date")
+                                .text((new Date(d.date)).toLocaleDateString());
+                        d3.select("#tooltip")
+                                .select("#elevation")
+                                .text(d.elevationGain);
+                        d3.select("#tooltip")
+                                .select("#hr")
+                                .text(d.avgHR);
+                        d3.select("#tooltip")
+                                .select("#calories")
+                                .text(d.calories);
+                        d3.select("#tooltip").classed("hidden", false);
+
+                        d3.select(this)
+                                .attr("fill", svg3Select);
+                        svg1.select("rect[id='" + i + "svg1']")
+                                .attr("fill", barSelect);
+                        svg2.select("rect[id='" + i + "svg2']")
+                                .attr("fill", barSelect);
+                    }).on("mouseout", function(d, i) {
+                        d3.select("#tooltip").classed("hidden", true);
+                        d3.select(this)
+                                .attr("fill", svg3Fill);
+                        svg1.select("rect[id='" + i + "svg1']")
+                                .attr("fill", svg1Fill);
+                        svg2.select("rect[id='" + i + "svg2']")
+                                .attr("fill", svg2Fill);
+                    });
+
+            svg3.append("g").attr("class", "axis")
+                    .attr("transform", "translate(0, " + (scatterplot_h - scatterplotMargin - xAxisPadding) + ")")
+                    .call(elevationGainAxis2);
+
+            svg3.append("g").attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisPadding + "," + (0 - xAxisPadding) + ")")
+                    .call(caloriesAxis);
+
+            // Calories axis title
+            svg3.append("text")
+                    .attr("class", "axis-label")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (yAxisPadding/2 - 16) +","+(scatterplot_h/2 - 24)+")rotate(-90)")
+                    .text("Calories");
+
+            // Elevation Gain axis title
+            d3.select("#label")
+                    .style("left", w/2 - 24 + "px")
+                    .select("#labeltext")
+                    .text("Elevation Gain (feet)");
+
+            // sort barcharts by chart #1 - mileage
+            var sortBar1Plot = function() {
+                svg1.selectAll("rect")
+                        .sort(function (a, b) {
+                            if (bar1SortOrder)
+                            {
+                                return d3.descending(parseInt(a.distance), parseInt(b.distance));
+
+                            }
+                            else
+                            {
+                                return d3.ascending(parseInt(a.distance), parseInt(b.distance));
+                            }
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr("x", function (d, i) {
+                            return xScale(i);
+                        });
+                svg2.selectAll("rect")
+                        .sort(function (a, b) {
+                            if (bar1SortOrder)
+                            {
+                                return d3.descending(parseInt(a.distance), parseInt(b.distance));
+                            }
+                            else
+                            {
+                                return d3.ascending(parseInt(a.distance), parseInt(b.distance));
+                            }
+
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr("x", function (d, i) {
+                            return xScale(i);
+                        });
+                bar1SortOrder = !bar1SortOrder;
+            };
+
+            // sort barcharts by chart #2 elevation gain
+            var sortBar2Plot = function(){
+                svg1.selectAll("rect")
+                        .sort(function(a,b) {
+                            if (bar2SortOrder) {
+                                return d3.descending(parseInt(a.elevationGain), parseInt(b.elevationGain));
+                            }
+                            else
+                            {
+                                return d3.ascending(parseInt(a.elevationGain), parseInt(b.elevationGain));
+                            }
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr("x", function(d,i) {
+                            return xScale(i);
+                        });
+                svg2.selectAll("rect")
+                        .sort(function(a,b) {
+                            if (bar2SortOrder)
+                            {
+                                return d3.descending(parseInt(a.elevationGain), parseInt(b.elevationGain));
+                            }
+                            else {
+                                return d3.ascending(parseInt(a.elevationGain), parseInt(b.elevationGain));
+                            }
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr("x", function(d,i) {
+                            return xScale(i);
+                        });
+                bar2SortOrder = !bar2SortOrder;
+            };
+
+            // reset sort of bar charts to ascending date
+            d3.select("#reset").on("click", function() {
+                svg1.selectAll("rect")
+                        .sort(function(a,b) {
+                            return d3.ascending(Date.parse(a.date), Date.parse(b.date));
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr({
+                            x: function (d, i) {
+                                return xScale(i);
+                            },
+                        });
+
+                svg2.selectAll("rect")
+                        .sort(function(a,b) {
+                            return d3.ascending(Date.parse(a.date), Date.parse(b.date));
+                        })
+                        .transition()
+                        .duration(1000)
+                        .attr({
+                            x: function (d, i) {
+                                return xScale(i);
+                            },
+                        });
+                    });
+
+        });
+    </script>
+
+</body>
+</html>

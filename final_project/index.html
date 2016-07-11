@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        div.mortality {
+            background-color: white;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 72px;
+            color: darkred;
+        }
+    </style>
+    <title>COPD Risk Assessment</title>
+</head>
+<body>
+<div class="mortality">
+    <p><span id="mortalityIndex">100</span></p>
+</div>
+<div id="bar1"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+
+    d3.csv('https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/final_project/copd_factors_anon_norm.csv',
+            function(d) {
+                dataset = d;
+
+                var patient = 0;
+
+                var w = 800;
+                var h = 400;
+
+                var barMargin = 20;
+                var barPadding = 5;
+
+                var svg1Fill = "teal";
+
+                var svg1 = d3.select("#bar1")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h)
+                        .attr("id", "svg1");
+
+                var barScale = d3.scale.linear()
+                        .domain([0, 1])
+                        .range([0, h - barMargin]);
+
+                // distance bar chart
+                svg1.selectAll("rect")
+                        .data(dataset)
+                        .append("rect")
+                        .attr({
+                            x: function (d, i) {
+                                return i * 25;
+                            },
+                            y: function (d) {
+                                return h - barScale(d.MDF1_norm);
+                            },
+                            width: 22,
+                            height: function (d) {
+                                return barScale(d.MDF1_norm)
+                            },
+                            fill: svg1Fill,
+                            id: function (d, i) {
+                                return i + "svg1";
+                            }
+                        })
+
+
+        });
+    </script>
+</body>
+</html>
