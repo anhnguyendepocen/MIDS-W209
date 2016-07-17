@@ -10,65 +10,123 @@
             font-size: 72px;
             color: darkred;
         }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        .box {
+            font: 10px sans-serif;
+        }
+
+        .box line,
+        .box rect,
+        .box circle {
+            fill: #fff;
+            stroke: #000;
+            stroke-width: 1.5px;
+        }
+
+        .box .center {
+            stroke-dasharray: 3,3;
+        }
+
+        .box .outlier {
+            fill: none;
+            stroke: #ccc;
+        }
+
     </style>
     <title>COPD Risk Assessment</title>
 </head>
 <body>
 <div class="mortality">
     <p><span id="mortalityIndex">100</span></p>
+    <p><span id="pca"></span></p>
 </div>
 <div id="bar1"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" charset="utf-8"></script>
+<script src="d3.js"></script>
+<script src="boxplot.js"></script>
 <script type="text/javascript">
 
-    d3.csv('https://raw.githubusercontent.com/rocket-ron/MIDS-W209/master/final_project/copd_factors_anon_norm.csv',
-            function(d) {
-                dataset = d;
+    var margin = {top: 10, right: 50, bottom: 340, left: 50},
+            width = 120 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
 
-                var patient = 0;
+    var min = Infinity,
+            max = -Infinity;
 
-                var w = 800;
-                var h = 400;
+    var chart = d3.box()
+            .whiskers(iqr(1.5))
+            .width(width)
+            .height(height);
 
-                var barMargin = 20;
-                var barPadding = 5;
+    d3.csv("data1.csv",
+        function(error, csv) {
 
-                var svg1Fill = "teal";
+        if (error) throw error;
 
-                var svg1 = d3.select("#bar1")
-                        .append("svg")
-                        .attr("width", w)
-                        .attr("height", h)
-                        .attr("id", "svg1");
+        var data = [];
 
-                var barScale = d3.scale.linear()
-                        .domain([0, 1])
-                        .range([0, h - barMargin]);
+        /* This is really hacky but good for a first try */
+        csv.forEach(function (x) {
+            var pca1 = data[0],
+                    pca2 = data[1],
+                    pca3 = data[2],
+                    pca4 = data[3],
+                    pca5 = data[4];
 
-                // distance bar chart
-                svg1.selectAll("rect")
-                        .data(dataset)
-                        .append("rect")
-                        .attr({
-                            x: function (d, i) {
-                                return i * 25;
-                            },
-                            y: function (d) {
-                                return h - barScale(d.MDF1_norm);
-                            },
-                            width: 22,
-                            height: function (d) {
-                                return barScale(d.MDF1_norm)
-                            },
-                            fill: svg1Fill,
-                            id: function (d, i) {
-                                return i + "svg1";
-                            }
-                        })
-
+            if (!pca1) pca1 = data[0] = [x.PCA1];
+            else pca1.push(x.PCA1);
+            if (x.PCA1 > max) max = x.PCA1;
+            if (x.PCA1 < min) min = x.PCA1;
+            if (!pca2) pca2 = data[1] = [x.PCA2];
+            else pca2.push(x.PCA2);
+            if (x.PCA2 > max) max = x.PCA2;
+            if (x.PCA2 < min) min = x.PCA2;
+            if (!pca3) pca3 = data[2] = [x.PCA3];
+            else pca3.push(x.PCA3);
+            if (x.PCA3 > max) max = x.PCA3;
+            if (x.PCA3 < min) min = x.PCA3;
+            if (!pca4) pca4 = data[3] = [x.PCA4];
+            else pca4.push(x.PCA4);
+            if (x.PCA4 > max) max = x.PCA4;
+            if (x.PCA4 < min) min = x.PCA4;
+            if (!pca5) pca5 = data[4] = [x.PCA5];
+            else pca5.push(x.PCA5);
+            if (x.PCA5 > max) max = x.PCA5;
+            if (x.PCA5 < min) min = x.PCA5;
 
         });
+
+
+        chart.domain([min, max]);
+
+        var svg = d3.select("#boxplots").selectAll("svg")
+                .data(data)
+                .enter().append("svg")
+                .attr("class", "box")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.bottom + margin.top)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                .call(chart);
+    });
+    // Returns a function to compute the interquartile range.
+    function iqr(k) {
+        return function(d, i) {
+            var q1 = d.quartiles[0],
+                    q3 = d.quartiles[2],
+                    iqr = (q3 - q1) * k,
+                    i = -1,
+                    j = d.length;
+            while (d[++i] < q1 - iqr);
+            while (d[--j] > q3 + iqr);
+            return [i, j];
+        };
+    }
+
     </script>
 </body>
 </html>

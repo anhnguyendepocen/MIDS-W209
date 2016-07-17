@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>d3 Horizontal BoxPlot</title>
+
+    <script type="text/javascript" src="d3.js"></script>
+
+    <script type="text/javascript" src="horizontalboxplot.js"></script>
+
+    <link rel="stylesheet" href="main.css">
+
+    <script>
+
+         function tickFormatter(d) {
+             if (d !== (d | 0)) {
+                  // format non-integers as 1-decimal float
+                  return d3.format('0.2f')(d);
+             } else if (d < 1000) {
+                  // format just as integers
+                  return d3.format('d')(d);
+             } else if (d < 10000 && (d % 1000 === 0)) {
+                  // format using SI, to 1 significant digit
+                  return d3.format('0.2s')(d);
+             } else {
+                  // format using SI, to 2 significant digits
+                  return d3.format('0.2s')(d);
+             }
+         }
+         var min = Infinity, max = -Infinity;
+
+         d3.csv("data1.csv", function (error, csv) {
+
+              if (error) throw error;
+              var pca = [];
+              var mdf = [];
+              var mortalityProb = [];
+
+              csv.forEach(function (x) {
+
+                  // get the PCA data
+                  var pca1 = pca[0],
+                         pca2 = pca[1],
+                         pca3 = pca[2],
+                         pca4 = pca[3],
+                         pca5 = pca[4];
+
+                  if (!pca1) pca1 = pca[0] = [x.PCA1];
+                  else pca1.push(x.PCA1);
+
+                  if (!pca2) pca2 = pca[1] = [x.PCA2];
+                  else pca2.push(x.PCA2);
+
+                  if (!pca3) pca3 = pca[2] = [x.PCA3];
+                  else pca3.push(x.PCA3);
+
+                  if (!pca4) pca4 = pca[3] = [x.PCA4];
+                  else pca4.push(x.PCA4);
+
+                  if (!pca5) pca5 = pca[4] = [x.PCA5];
+                  else pca5.push(x.PCA5);
+
+                  // get the MDF data for all patients
+                  var mdf1 = mdf[0],
+                         mdf2 = mdf[1],
+                         mdf3 = mdf[2],
+                         mdf4 = mdf[3],
+                         mdf5 = mdf[4];
+
+                  if (!mdf1) mdf1 = mdf[0] = [x.MD1];
+                  else mdf1.push(x.MD1);
+
+                  if (!mdf2) mdf2 = mdf[1] = [x.MD2];
+                  else mdf2.push(x.MD2);
+
+                  if (!mdf3) mdf3 = mdf[2] = [x.MD3];
+                  else mdf3.push(x.MD3);
+
+                  if (!mdf4) mdf4 = mdf[3] = [x.MD4];
+                  else mdf4.push(x.MD4);
+
+                  if (!mdf5) mdf5 = mdf[4] = [x.MD5];
+                  else mdf5.push(x.MD5);
+
+                  // get the mortality probabilities
+                  if (!mortalityProb[0]) mortalityProb[0] = [x.MortalityProb];
+                  else mortalityProb.push(x.MortalityProb);
+              });
+
+              // BOX PLOTS
+              var chartRange = [-3, 3];
+              var totalWidth = 450,
+                     totalHeight = 120,
+                     margin = {
+                         top: 30,
+                         right: 30,
+                         bottom: 50,
+                         left: 30
+                     },
+                     width = totalWidth - margin.left - margin.right,
+                     height = totalHeight - margin.top - margin.bottom;
+              var chart = d3.box()
+                     .width(width)
+                     .height(height)
+                     .domain([chartRange[0], chartRange[1]]);
+              var xScale = d3.scale.linear()
+              // this is the data x values
+                     .domain([chartRange[0], chartRange[1]])
+                     // this is the svg width
+                     .range([0, width]);
+              var svg = d3.select('.boxplots').selectAll('svg')
+                     .data(pca)
+                     .enter()
+                     .append('svg')
+                     .attr('width', totalWidth)
+                     .attr('height', totalHeight)
+                     .append('g')
+                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                     .call(chart);
+              // axis
+              var xAxis = d3.svg.axis()
+                     .scale(xScale)
+                     .orient('bottom')
+                     .ticks(10)
+                     .tickFormat(tickFormatter);
+              // add axis
+              svg.append('g')
+                     .attr('class', 'x axis')
+                     .attr('transform', 'translate(0,' + (height + 20) + ')')
+                     .call(xAxis);
+
+              // PATIENT BAR MDF BAR CHART
+              var barChartHeight = 615;
+              var patientSelector = 80;
+              var barChartMargin = 40;
+              var barChartWidth = 300;
+              var barExtent = (barChartWidth / 2)-barChartMargin;
+              var barChartZeroLine = barChartMargin + barExtent;
+              var barHeight = 40;
+              var barPadding = 120 - barHeight;
+              var barChartRange = [-1, 1];
+
+              // set up a zero line that allows bars extending horizontally in both directions
+              var xScaleBar = d3.scale.linear()
+                     .domain([barChartRange[0], barChartRange[1]])
+                     .range([barChartZeroLine - barExtent, barChartZeroLine + barExtent]);
+
+              var svg1 = d3.select('.barchart')
+                     .append("svg")
+                     .attr("width", barChartWidth)
+                     .attr("height", barChartHeight)
+                     .attr("id", "svgBarchart");
+
+              svg1.selectAll("rect")
+                     .data(mdf)
+                     .enter()
+                     .append("rect")
+                     .attr({
+                         class: 'bar',
+                         x: function (d) {
+                             return xScaleBar(d[patientSelector]) > barChartZeroLine ? barChartZeroLine :
+                                     xScaleBar(d[patientSelector]);
+                         },
+                         y: function (d, i) {
+                             return barChartMargin + (i * (barHeight + barPadding));
+                         },
+                         width: function (d) {
+                             return Math.abs(barChartZeroLine - xScaleBar(d[patientSelector]));
+                         },
+                         height: barHeight,
+                         fill: "teal"
+                     });
+
+              svg1.selectAll("text")
+                     .data(mdf)
+                     .enter()
+                     .append("text")
+                     .attr('class', 'bar-label')
+                     .text(function(d) {
+                         return d[patientSelector];
+                     })
+                     .attr({
+                         x: function(d) {
+                            return barChartWidth - barChartMargin;
+                        },
+                         y: function(d,i) {
+                            return barChartMargin + (i * (barHeight + barPadding) - 5);
+                         }
+                     });
+
+              d3.select('.barchart').select('svg')
+                     .append('line')
+                     .attr({
+                         x1: barChartZeroLine,
+                         y1: barChartMargin,
+                         x2: barChartZeroLine,
+                         y2: barChartHeight - barChartMargin,
+                         style: "stroke:rgb(0,0,0);stroke-width:1"
+                     });
+
+              // patient score
+              d3.select('#patientScore').select('#score')
+                     .text(d3.format('0.1f')(100*mortalityProb[patientSelector]));
+
+              // next button
+              /*
+              d3.select("#navNext").on("click", function() {
+                  patientSelector == 99 ? 0 : patientSelector++;
+                  drawBars();
+                  drawLabels();
+              });
+              */
+         });
+
+    </script>
+
+</head>
+
+<body>
+
+<div id="divcontainer">
+    <div id="header">
+        <div id="nav">
+            <div id="navNext">
+                <input name="navNext"
+                       type="button"
+                       value="Next" />
+            </div>
+            <div id="navPrev">
+                <input name="navPrev"
+                       type="button"
+                       value="Prev" />
+            </div>
+        </div>
+        <div id="summary">
+            <div id="patientName"><span id="name" class="name">John Doe</span></div>
+            <div id="patientScore"><span id="score" class="score">50</span></div>
+        </div>
+    </div>
+    <div id="wrap">
+        <div id="left-side-labels">
+            <div style="height: 40px"></div>
+            <div><span class="disease-label">Disease A</span></div>
+            <div style="height: 104px"></div>
+            <div><span class="disease-label">Disease B</span></div>
+            <div style="height: 104px"></div>
+            <div><span class="disease-label">Disease C</span></div>
+            <div style="height: 104px"></div>
+            <div><span class="disease-label">Disease D</span></div>
+            <div style="height: 104px"></div>
+            <div><span class="disease-label">Disease E</span></div>
+        </div>
+        <div id="left_col">
+            <div class="boxplots"></div>
+        </div>
+        <div id="right_col">
+            <div class="barchart"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
